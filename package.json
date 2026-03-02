@@ -8,7 +8,9 @@
     "format": "prettier --write .",
     "lint": "eslint",
     "start": "next start",
-    "style": "stylelint"
+    "lint:css": "stylelint \"**/*.css\"",
+    "lint:css:fix": "stylelint \"**/*.css\" --fix",
+    "cm": "git cz"
   },
   "overrides": {
     "@typescript-eslint/typescript-estree": "^8.0.0",
@@ -59,5 +61,10 @@
   "trustedDependencies": [
     "sharp",
     "unrs-resolver"
-  ]
+  ],
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-git"
+    }
+  }
 }
