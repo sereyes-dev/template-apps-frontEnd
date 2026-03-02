@@ -34,295 +34,334 @@
 
 /** @type {import('cz-git').UserConfig} */
 const config = {
-    // ---------------------------------------------------------------------------
-    // [1] REGLAS DE COMMITLINT
-    //     Validan el mensaje de commit generado por cz-git (o escrito a mano).
-    // ---------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
+  // [1] REGLAS DE COMMITLINT
+  //     Validan el mensaje de commit generado por cz-git (o escrito a mano).
+  // ---------------------------------------------------------------------------
 
-    extends: ['@commitlint/config-conventional'],
+  extends: ['@commitlint/config-conventional'],
 
-    // El parserPreset reconoce el emoji que cz-git agrega al inicio del header.
-    // Resultado final del commit: ✨ feat(auth): add Google OAuth login
-    parserPreset: {
-        parserOpts: {
-            headerPattern:
-                /^([\p{Emoji_Presentation}\p{Extended_Pictographic}\s]*)\s*(\w+)(?:\(([^)]+)\))?(!)?\s*:\s+(.+?)\s*$/u,
-            headerCorrespondence: ['emojiStart', 'type', 'scope', 'breaking', 'subject'],
-            noteKeywords: ['BREAKING CHANGE', 'BREAKING-CHANGE'],
-            issuePrefixes: ['Fixes ', 'Closes ', 'Related to ', 'Refs '],
-        },
-    },
+  // El parserPreset reconoce el emoji que cz-git agrega al inicio del header.
+  // Resultado final del commit: ✨ feat(auth): add Google OAuth login
+  parserPreset: {
+    parserOpts: {
+      headerPattern:
+        /^([\p{Emoji_Presentation}\p{Extended_Pictographic}\s]*)\s*(\w+)(?:\(([^)]+)\))?(!)?\s*:\s+(.+?)\s*$/u,
+      headerCorrespondence: [
+        'emojiStart',
+        'type',
+        'scope',
+        'breaking',
+        'subject'
+      ],
+      noteKeywords: ['BREAKING CHANGE', 'BREAKING-CHANGE'],
+      issuePrefixes: ['Fixes ', 'Closes ', 'Related to ', 'Refs ']
+    }
+  },
 
-    formatter: '@commitlint/format',
+  formatter: '@commitlint/format',
 
-    rules: {
-        // =========================================================================
-        // TYPE
-        // =========================================================================
+  rules: {
+    // =========================================================================
+    // TYPE
+    // =========================================================================
 
-        'type-enum': [
-            2,
-            'always',
-            [
-                'feat',      // ✨ nueva funcionalidad
-                'fix',       // 🐛 corrección de bug
-                'docs',      // 📝 documentación
-                'style',     // 💄 estilos CSS / formato
-                'refactor',  // ♻️  reestructuración
-                'perf',      // ⚡ rendimiento
-                'test',      // 🧪 tests
-                'build',     // 🏗️  build y dependencias
-                'ci',        // 💚 CI/CD
-                'chore',     // 🔧 mantenimiento
-                'revert',    // ⏪ revertir
-            ],
-        ],
-
-        'type-case': [2, 'always', 'lower-case'],
-        'type-empty': [2, 'never'],
-
-        // =========================================================================
-        // SCOPE — módulos del frontend Next.js (warning, no error)
-        // =========================================================================
-
-        'scope-enum': [
-            1,
-            'always',
-            [
-                'app', 'pages', 'layout', 'middleware',
-                'ui', 'components', 'icons', 'animations',
-                'auth', 'api', 'hooks', 'context', 'store', 'forms',
-                'fetch', 'cache', 'types', 'styles', 'tailwind',
-                'config', 'deps', 'tests', 'ci', 'a11y', 'seo', 'i18n',
-            ],
-        ],
-
-        'scope-case': [2, 'always', 'lower-case'],
-
-        // =========================================================================
-        // SUBJECT
-        // =========================================================================
-
-        'subject-empty': [2, 'never'],
-        'header-max-length': [2, 'always', 110],
-        'header-min-length': [2, 'always', 10],
-        'subject-full-stop': [2, 'never', '.'],
-        'subject-case': [2, 'never', ['start-case', 'pascal-case', 'upper-case']],
-
-        // =========================================================================
-        // BODY Y FOOTER
-        // =========================================================================
-
-        'body-leading-blank': [2, 'always'],
-        'body-max-line-length': [2, 'always', 100],
-        'footer-leading-blank': [2, 'always'],
-        'footer-max-line-length': [2, 'always', 100],
-    },
-
-    ignores: [
-        (commit) => commit.startsWith('Merge '),
-        (commit) => commit.startsWith('Revert "'),
-        (commit) => /^v\d+\.\d+\.\d+/.test(commit),
+    'type-enum': [
+      2,
+      'always',
+      [
+        'feat', // ✨ nueva funcionalidad
+        'fix', // 🐛 corrección de bug
+        'docs', // 📝 documentación
+        'style', // 💄 estilos CSS / formato
+        'refactor', // ♻️  reestructuración
+        'perf', // ⚡ rendimiento
+        'test', // 🧪 tests
+        'build', // 🏗️  build y dependencias
+        'ci', // 💚 CI/CD
+        'chore', // 🔧 mantenimiento
+        'revert' // ⏪ revertir
+      ]
     ],
 
-    defaultIgnores: true,
-    helpUrl: 'https://www.conventionalcommits.org/en/v1.0.0/',
+    'type-case': [2, 'always', 'lower-case'],
+    'type-empty': [2, 'never'],
 
-    // ---------------------------------------------------------------------------
-    // [2] CONFIGURACIÓN DEL WIZARD — cz-git (sección `prompt`)
+    // =========================================================================
+    // SCOPE — módulos del frontend Next.js (warning, no error)
+    // =========================================================================
+
+    'scope-enum': [
+      1,
+      'always',
+      [
+        'app',
+        'pages',
+        'layout',
+        'middleware',
+        'ui',
+        'components',
+        'icons',
+        'animations',
+        'auth',
+        'api',
+        'hooks',
+        'context',
+        'store',
+        'forms',
+        'fetch',
+        'cache',
+        'types',
+        'styles',
+        'tailwind',
+        'config',
+        'deps',
+        'tests',
+        'ci',
+        'a11y',
+        'seo',
+        'i18n'
+      ]
+    ],
+
+    'scope-case': [2, 'always', 'lower-case'],
+
+    // =========================================================================
+    // SUBJECT
+    // =========================================================================
+
+    'subject-empty': [2, 'never'],
+    'header-max-length': [2, 'always', 110],
+    'header-min-length': [2, 'always', 10],
+    'subject-full-stop': [2, 'never', '.'],
+    'subject-case': [2, 'never', ['start-case', 'pascal-case', 'upper-case']],
+
+    // =========================================================================
+    // BODY Y FOOTER
+    // =========================================================================
+
+    'body-leading-blank': [2, 'always'],
+    'body-max-line-length': [2, 'always', 100],
+    'footer-leading-blank': [2, 'always'],
+    'footer-max-line-length': [2, 'always', 100]
+  },
+
+  ignores: [
+    (commit) => commit.startsWith('Merge '),
+    (commit) => commit.startsWith('Revert "'),
+    (commit) => /^v\d+\.\d+\.\d+/.test(commit)
+  ],
+
+  defaultIgnores: true,
+  helpUrl: 'https://www.conventionalcommits.org/en/v1.0.0/',
+
+  // ---------------------------------------------------------------------------
+  // [2] CONFIGURACIÓN DEL WIZARD — cz-git (sección `prompt`)
+  //
+  // Esta sección configura el CLI interactivo que aparece al correr `bun run cm`.
+  // cz-git lee automáticamente esta sección del commitlint.config.mjs.
+  // ---------------------------------------------------------------------------
+
+  prompt: {
+    // =========================================================================
+    // EMOJIS
+    // =========================================================================
+
+    // useEmoji: agrega el emoji del type elegido al inicio del commit.
+    //   Al seleccionar "refactor" → el commit queda: ♻️  refactor(scope): subject
+    //   Al seleccionar "feat"     → el commit queda: ✨ feat(scope): subject
+    useEmoji: true,
+
+    // emojiAlign: posición del emoji en la lista del MENÚ del terminal.
+    //   'left'   → ✨ feat:    descripción     ← más legible, icono-primero
+    //   'center' → feat ✨:   descripción
+    //   'right'  → feat:   descripción ✨
     //
-    // Esta sección configura el CLI interactivo que aparece al correr `bun run cm`.
-    // cz-git lee automáticamente esta sección del commitlint.config.mjs.
-    // ---------------------------------------------------------------------------
+    // 'left' es el estándar de UX: el ojo escanea de izquierda a derecha,
+    // el emoji actúa como ícono visual antes de leer el texto del type.
+    emojiAlign: 'left',
 
-    prompt: {
-        // =========================================================================
-        // EMOJIS
-        // =========================================================================
+    // themeColorCode: color del encabezado del wizard en la terminal (ANSI 8-bit).
+    // 38;5;043 = verde-azulado. Referencia: https://en.wikipedia.org/wiki/ANSI_escape_code
+    themeColorCode: '38;5;043',
 
-        // useEmoji: agrega el emoji del type elegido al inicio del commit.
-        //   Al seleccionar "refactor" → el commit queda: ♻️  refactor(scope): subject
-        //   Al seleccionar "feat"     → el commit queda: ✨ feat(scope): subject
-        useEmoji: true,
+    // =========================================================================
+    // TIPOS — lista del wizard con emojis asignados a cada type
+    // =========================================================================
+    //
+    // `emoji`: código gitmoji que cz-git convierte a unicode automáticamente.
+    // Los emojis en `name` son solo decoración visual en el menú.
+    // El emoji que se escribe en el commit viene del campo `emoji`.
 
-        // emojiAlign: posición del emoji en la lista del MENÚ del terminal.
-        //   'left'   → ✨ feat:    descripción     ← más legible, icono-primero
-        //   'center' → feat ✨:   descripción
-        //   'right'  → feat:   descripción ✨
-        //
-        // 'left' es el estándar de UX: el ojo escanea de izquierda a derecha,
-        // el emoji actúa como ícono visual antes de leer el texto del type.
-        emojiAlign: 'left',
+    types: [
+      {
+        value: 'feat',
+        name: 'feat:     ✨  A new feature',
+        emoji: ':sparkles:',
+        description: 'Nuevo componente, hook, página, feature flag, integración'
+      },
+      {
+        value: 'fix',
+        name: 'fix:      🐛  A bug fix',
+        emoji: ':bug:',
+        description:
+          'Corrección de bug: visual, funcional o de lógica de negocio'
+      },
+      {
+        value: 'docs',
+        name: 'docs:     📝  Documentation only',
+        emoji: ':memo:',
+        description: 'README, JSDoc, comentarios de código, Storybook docs'
+      },
+      {
+        value: 'style',
+        name: 'style:    💄  UI styles & formatting',
+        emoji: ':lipstick:',
+        description:
+          'CSS, Tailwind, diseño visual, formato de código (Prettier)'
+      },
+      {
+        value: 'refactor',
+        name: 'refactor: ♻️   Code refactoring',
+        emoji: ':recycle:',
+        description: 'Extraer componente, renombrar, reorganizar módulo o hook'
+      },
+      {
+        value: 'perf',
+        name: 'perf:     ⚡  Performance improvement',
+        emoji: ':zap:',
+        description:
+          'Memoización, lazy loading, code splitting, reduce re-renders'
+      },
+      {
+        value: 'test',
+        name: 'test:     🧪  Tests',
+        emoji: ':test_tube:',
+        description: 'Tests unitarios (Vitest), integración, E2E (Playwright)'
+      },
+      {
+        value: 'build',
+        name: 'build:    🏗️   Build & dependencies',
+        emoji: ':building_construction:',
+        description: 'next.config.ts, tailwind.config, package.json deps'
+      },
+      {
+        value: 'ci',
+        name: 'ci:       💚  CI/CD',
+        emoji: ':green_heart:',
+        description:
+          'GitHub Actions, Vercel config, Docker, deployment workflows'
+      },
+      {
+        value: 'chore',
+        name: 'chore:    🔧  Maintenance',
+        emoji: ':wrench:',
+        description:
+          'Herramientas de dev, .gitignore, configs de linting/testing'
+      },
+      {
+        value: 'revert',
+        name: 'revert:   ⏪  Revert a commit',
+        emoji: ':rewind:',
+        description: 'Revierte un commit anterior'
+      }
+    ],
 
-        // themeColorCode: color del encabezado del wizard en la terminal (ANSI 8-bit).
-        // 38;5;043 = verde-azulado. Referencia: https://en.wikipedia.org/wiki/ANSI_escape_code
-        themeColorCode: '38;5;043',
+    // =========================================================================
+    // SCOPES — sugerencias con autocompletado en el wizard
+    // =========================================================================
 
-        // =========================================================================
-        // TIPOS — lista del wizard con emojis asignados a cada type
-        // =========================================================================
-        //
-        // `emoji`: código gitmoji que cz-git convierte a unicode automáticamente.
-        // Los emojis en `name` son solo decoración visual en el menú.
-        // El emoji que se escribe en el commit viene del campo `emoji`.
+    scopes: [
+      { value: 'app', name: 'app:        estructura de app/ (App Router)' },
+      { value: 'pages', name: 'pages:      rutas y páginas' },
+      { value: 'layout', name: 'layout:     layouts compartidos' },
+      { value: 'middleware', name: 'middleware: middleware.ts de Next.js' },
+      { value: 'ui', name: 'ui:         componentes reutilizables' },
+      { value: 'components', name: 'components: componentes de feature' },
+      { value: 'icons', name: 'icons:      iconografía y SVGs' },
+      { value: 'animations', name: 'animations: animaciones y transiciones' },
+      { value: 'auth', name: 'auth:       autenticación y sesiones' },
+      { value: 'api', name: 'api:        route handlers (app/api/)' },
+      { value: 'hooks', name: 'hooks:      custom hooks de React' },
+      { value: 'context', name: 'context:    React Context providers' },
+      { value: 'store', name: 'store:      estado global (Zustand, Jotai)' },
+      { value: 'forms', name: 'forms:      formularios y validación (Zod)' },
+      { value: 'fetch', name: 'fetch:      fetching y server actions' },
+      { value: 'cache', name: 'cache:      estrategias de caché de Next.js' },
+      { value: 'types', name: 'types:      tipos e interfaces TypeScript' },
+      { value: 'styles', name: 'styles:     CSS global, variables, themes' },
+      { value: 'tailwind', name: 'tailwind:   configuración de Tailwind' },
+      { value: 'config', name: 'config:     archivos de configuración' },
+      { value: 'deps', name: 'deps:       dependencias npm' },
+      {
+        value: 'tests',
+        name: 'tests:      configuración de Vitest/Playwright'
+      },
+      { value: 'ci', name: 'ci:         workflows de CI/CD' },
+      { value: 'a11y', name: 'a11y:       accesibilidad' },
+      { value: 'seo', name: 'seo:        metadatos y SEO' },
+      { value: 'i18n', name: 'i18n:       internacionalización' }
+    ],
 
-        types: [
-            {
-                value: 'feat',
-                name: 'feat:     ✨  A new feature',
-                emoji: ':sparkles:',
-                description: 'Nuevo componente, hook, página, feature flag, integración',
-            },
-            {
-                value: 'fix',
-                name: 'fix:      🐛  A bug fix',
-                emoji: ':bug:',
-                description: 'Corrección de bug: visual, funcional o de lógica de negocio',
-            },
-            {
-                value: 'docs',
-                name: 'docs:     📝  Documentation only',
-                emoji: ':memo:',
-                description: 'README, JSDoc, comentarios de código, Storybook docs',
-            },
-            {
-                value: 'style',
-                name: 'style:    💄  UI styles & formatting',
-                emoji: ':lipstick:',
-                description: 'CSS, Tailwind, diseño visual, formato de código (Prettier)',
-            },
-            {
-                value: 'refactor',
-                name: 'refactor: ♻️   Code refactoring',
-                emoji: ':recycle:',
-                description: 'Extraer componente, renombrar, reorganizar módulo o hook',
-            },
-            {
-                value: 'perf',
-                name: 'perf:     ⚡  Performance improvement',
-                emoji: ':zap:',
-                description: 'Memoización, lazy loading, code splitting, reduce re-renders',
-            },
-            {
-                value: 'test',
-                name: 'test:     🧪  Tests',
-                emoji: ':test_tube:',
-                description: 'Tests unitarios (Vitest), integración, E2E (Playwright)',
-            },
-            {
-                value: 'build',
-                name: 'build:    🏗️   Build & dependencies',
-                emoji: ':building_construction:',
-                description: 'next.config.ts, tailwind.config, package.json deps',
-            },
-            {
-                value: 'ci',
-                name: 'ci:       💚  CI/CD',
-                emoji: ':green_heart:',
-                description: 'GitHub Actions, Vercel config, Docker, deployment workflows',
-            },
-            {
-                value: 'chore',
-                name: 'chore:    🔧  Maintenance',
-                emoji: ':wrench:',
-                description: 'Herramientas de dev, .gitignore, configs de linting/testing',
-            },
-            {
-                value: 'revert',
-                name: 'revert:   ⏪  Revert a commit',
-                emoji: ':rewind:',
-                description: 'Revierte un commit anterior',
-            },
-        ],
+    // =========================================================================
+    // COMPORTAMIENTO DEL WIZARD
+    // =========================================================================
 
-        // =========================================================================
-        // SCOPES — sugerencias con autocompletado en el wizard
-        // =========================================================================
+    // Permite seleccionar múltiples scopes separados por coma.
+    // false → solo un scope por commit (más limpio y convencional).
+    enableMultipleScopes: false,
 
-        scopes: [
-            { value: 'app', name: 'app:        estructura de app/ (App Router)' },
-            { value: 'pages', name: 'pages:      rutas y páginas' },
-            { value: 'layout', name: 'layout:     layouts compartidos' },
-            { value: 'middleware', name: 'middleware: middleware.ts de Next.js' },
-            { value: 'ui', name: 'ui:         componentes reutilizables' },
-            { value: 'components', name: 'components: componentes de feature' },
-            { value: 'icons', name: 'icons:      iconografía y SVGs' },
-            { value: 'animations', name: 'animations: animaciones y transiciones' },
-            { value: 'auth', name: 'auth:       autenticación y sesiones' },
-            { value: 'api', name: 'api:        route handlers (app/api/)' },
-            { value: 'hooks', name: 'hooks:      custom hooks de React' },
-            { value: 'context', name: 'context:    React Context providers' },
-            { value: 'store', name: 'store:      estado global (Zustand, Jotai)' },
-            { value: 'forms', name: 'forms:      formularios y validación (Zod)' },
-            { value: 'fetch', name: 'fetch:      fetching y server actions' },
-            { value: 'cache', name: 'cache:      estrategias de caché de Next.js' },
-            { value: 'types', name: 'types:      tipos e interfaces TypeScript' },
-            { value: 'styles', name: 'styles:     CSS global, variables, themes' },
-            { value: 'tailwind', name: 'tailwind:   configuración de Tailwind' },
-            { value: 'config', name: 'config:     archivos de configuración' },
-            { value: 'deps', name: 'deps:       dependencias npm' },
-            { value: 'tests', name: 'tests:      configuración de Vitest/Playwright' },
-            { value: 'ci', name: 'ci:         workflows de CI/CD' },
-            { value: 'a11y', name: 'a11y:       accesibilidad' },
-            { value: 'seo', name: 'seo:        metadatos y SEO' },
-            { value: 'i18n', name: 'i18n:       internacionalización' },
-        ],
+    // Texto del scope vacío (sin scope) en el menú.
+    emptyScopesAlias: 'empty  (sin scope)',
+    customScopesAlias: 'custom (escribir scope manualmente)',
 
-        // =========================================================================
-        // COMPORTAMIENTO DEL WIZARD
-        // =========================================================================
+    // No transforma el subject a mayúsculas automáticamente.
+    // El estándar Conventional Commits usa lowercase.
+    upperCaseSubject: false,
 
-        // Permite seleccionar múltiples scopes separados por coma.
-        // false → solo un scope por commit (más limpio y convencional).
-        enableMultipleScopes: false,
+    // Carácter para saltos de línea en el body del wizard.
+    // "Mi primera línea|Mi segunda línea" → dos párrafos en el body.
+    breaklineChar: '|',
 
-        // Texto del scope vacío (sin scope) en el menú.
-        emptyScopesAlias: 'empty  (sin scope)',
-        customScopesAlias: 'custom (escribir scope manualmente)',
+    // Preguntas del wizard que se muestran siempre.
+    // Vacío = se muestran todas las preguntas (recomendado para equipos).
+    skipQuestions: [],
 
-        // No transforma el subject a mayúsculas automáticamente.
-        // El estándar Conventional Commits usa lowercase.
-        upperCaseSubject: false,
+    // Prefijos de issue disponibles en el prompt de footer.
+    issuePrefixes: [
+      { value: 'Closes', name: 'Closes:     cierra el issue al hacer merge' },
+      { value: 'Fixes', name: 'Fixes:      marca el issue como resuelto' },
+      {
+        value: 'Related to',
+        name: 'Related to: referencia sin cerrar el issue'
+      },
+      { value: 'Refs', name: 'Refs:       referencia general' }
+    ],
 
-        // Carácter para saltos de línea en el body del wizard.
-        // "Mi primera línea|Mi segunda línea" → dos párrafos en el body.
-        breaklineChar: '|',
+    customIssuePrefixAlign: 'left',
+    confirmColorize: true,
 
-        // Preguntas del wizard que se muestran siempre.
-        // Vacío = se muestran todas las preguntas (recomendado para equipos).
-        skipQuestions: [],
+    // =========================================================================
+    // MENSAJES DEL WIZARD (en español)
+    // =========================================================================
 
-        // Prefijos de issue disponibles en el prompt de footer.
-        issuePrefixes: [
-            { value: 'Closes', name: 'Closes:     cierra el issue al hacer merge' },
-            { value: 'Fixes', name: 'Fixes:      marca el issue como resuelto' },
-            { value: 'Related to', name: 'Related to: referencia sin cerrar el issue' },
-            { value: 'Refs', name: 'Refs:       referencia general' },
-        ],
+    messages: {
+      type: '¿Qué tipo de cambio estás commiteando?',
+      scope: '¿Cuál es el alcance del cambio? (opcional, Tab para sugerencias)',
+      customScope: 'Escribe el scope manualmente:',
+      subject:
+        'Describe brevemente el cambio (imperativo: "add", "fix", "update"):',
+      body: 'Descripción detallada (opcional, usa "|" para nuevas líneas):',
+      breaking: 'Lista los BREAKING CHANGES (deja vacío si no aplica):',
+      footerPrefixsSelect: '¿Este commit referencia algún issue?',
+      customFooterPrefixs: 'Escribe el prefijo del issue:',
+      footer: 'Issues referenciados (ej: Closes #123, Fixes #456):',
+      confirmCommit: '¿Confirmas este commit?'
+    }
+  }
+};
 
-        customIssuePrefixAlign: 'left',
-        confirmColorize: true,
-
-        // =========================================================================
-        // MENSAJES DEL WIZARD (en español)
-        // =========================================================================
-
-        messages: {
-            type: '¿Qué tipo de cambio estás commiteando?',
-            scope: '¿Cuál es el alcance del cambio? (opcional, Tab para sugerencias)',
-            customScope: 'Escribe el scope manualmente:',
-            subject: 'Describe brevemente el cambio (imperativo: "add", "fix", "update"):',
-            body: 'Descripción detallada (opcional, usa "|" para nuevas líneas):',
-            breaking: 'Lista los BREAKING CHANGES (deja vacío si no aplica):',
-            footerPrefixsSelect: '¿Este commit referencia algún issue?',
-            customFooterPrefixs: 'Escribe el prefijo del issue:',
-            footer: 'Issues referenciados (ej: Closes #123, Fixes #456):',
-            confirmCommit: '¿Confirmas este commit?',
-        },
-    },
-}
-
-export default config
+export default config;
 
 // =============================================================================
 // 📋 GUÍA DE USO — FRONTEND

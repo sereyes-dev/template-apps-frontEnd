@@ -4,13 +4,18 @@
   "private": true,
   "scripts": {
     "build": "next build",
+    "cm": "git cz",
     "dev": "next dev",
     "format": "prettier --write .",
     "lint": "eslint",
-    "start": "next start",
     "lint:css": "stylelint \"**/*.css\"",
     "lint:css:fix": "stylelint \"**/*.css\" --fix",
-    "cm": "git cz"
+    "start": "next start"
+  },
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-git"
+    }
   },
   "overrides": {
     "@typescript-eslint/typescript-estree": "^8.0.0",
@@ -25,11 +30,19 @@
     "@double-great/stylelint-a11y": "^3.4.5",
     "@prettier/plugin-xml": "^3.4.2",
     "@tailwindcss/postcss": "^4",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@typescript-eslint/eslint-plugin": "^8.56.1",
     "@typescript-eslint/parser": "^8.56.1",
+    "@vitejs/plugin-react": "^5.1.4",
+    "@vitest/coverage-v8": "^4.0.18",
+    "@vitest/ui": "^4.0.18",
+    "axe-core": "^4.11.1",
     "eslint": "^9",
     "eslint-config-next": "^16.1.6",
     "eslint-config-prettier": "^10.1.8",
@@ -42,6 +55,8 @@
     "eslint-plugin-testing-library": "^7.16.0",
     "eslint-plugin-unicorn": "^63.0.0",
     "eslint-plugin-vitest": "^0.5.4",
+    "jsdom": "^28.1.0",
+    "msw": "^2.12.10",
     "prettier": "^3.8.1",
     "prettier-plugin-organize-imports": "^4.3.0",
     "prettier-plugin-packagejson": "^3.0.0",
@@ -52,7 +67,10 @@
     "stylelint-config-tailwindcss": "^1.0.1",
     "stylelint-order": "^7.0.1",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vite-tsconfig-paths": "^6.1.1",
+    "vitest": "^4.0.18",
+    "vitest-axe": "^0.1.0"
   },
   "ignoreScripts": [
     "sharp",
@@ -61,10 +79,5 @@
   "trustedDependencies": [
     "sharp",
     "unrs-resolver"
-  ],
-  "config": {
-    "commitizen": {
-      "path": "node_modules/cz-git"
-    }
-  }
+  ]
 }
