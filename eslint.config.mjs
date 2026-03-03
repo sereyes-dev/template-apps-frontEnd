@@ -513,7 +513,8 @@ export default defineConfig([
     'playwright-report/**',
     'test-results/**',
     'public/**',
-    '*.min.js'
+    '*.min.js',
+    '.husky'
   ]),
 
   // ---------------------------------------------------------------------------
