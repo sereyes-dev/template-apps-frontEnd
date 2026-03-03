@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "build": "next build",
-    "cm": "git cz",
+    "cm": "czg",
     "dev": "next dev",
     "format": "prettier --write .",
     "lint": "eslint",
@@ -46,6 +46,8 @@
     "@vitest/coverage-v8": "^4.0.18",
     "@vitest/ui": "^4.0.18",
     "axe-core": "^4.11.1",
+    "cz-git": "^1.12.0",
+    "czg": "^1.12.0",
     "eslint": "^9",
     "eslint-config-next": "^16.1.6",
     "eslint-config-prettier": "^10.1.8",
