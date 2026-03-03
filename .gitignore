@@ -2,6 +2,9 @@
 
 # dependencies
 /node_modules
+playwright/.auth/
+/playwright-report
+/test-results
 /.pnp
 .pnp.*
 .yarn/*
