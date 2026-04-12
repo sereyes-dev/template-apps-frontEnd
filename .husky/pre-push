@@ -1,2 +1,2 @@
 #!/bin/sh
-    bun run test:ci && bun run build
+bun run typecheck

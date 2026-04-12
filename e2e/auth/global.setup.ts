@@ -35,10 +35,10 @@
 //   E2E_ADMIN_PASSWORD → contraseña del admin de test (opcional)
 // =============================================================================
 
+import { STORAGE_STATE } from '@/playwright.config';
 import { expect, test as setup } from '@playwright/test';
 import fs from 'fs';
 import path from 'path';
-import { STORAGE_STATE } from './playwright.config';
 
 // ---------------------------------------------------------------------------
 // SETUP: LOGIN DE USUARIO ESTÁNDAR

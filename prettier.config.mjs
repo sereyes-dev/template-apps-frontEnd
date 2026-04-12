@@ -218,7 +218,7 @@ const config = {
   // Ajusta la ruta si tu tailwind.config está en una ubicación diferente.
   // En Next.js 16 + Tailwind v4, esta opción puede no ser necesaria si
   // Tailwind detecta la configuración automáticamente mediante CSS @config.
-  tailwindStylesheet: './app/globals.css',
+  tailwindStylesheet: './src/app/globals.css',
 
   // ---------------------------------------------------------------------------
   // OVERRIDES POR TIPO DE ARCHIVO

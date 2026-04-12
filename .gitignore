@@ -2,9 +2,6 @@
 
 # dependencies
 /node_modules
-playwright/.auth/
-/playwright-report
-/test-results
 /.pnp
 .pnp.*
 .yarn/*
@@ -15,6 +12,9 @@ playwright/.auth/
 
 # testing
 /coverage
+playwright/.auth/
+/playwright-report
+/test-results
 
 # next.js
 /.next/

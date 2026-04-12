@@ -1,0 +1,295 @@
+# =============================================================================
+# .github/workflows/ci.yml — Pipeline principal de CI
+# =============================================================================
+#
+# Etapas (en orden, con dependencias):
+#
+#   1. quality  → ESLint (--max-warnings 0) + Stylelint + type-check
+#   2. test     → Vitest (coverage v8, thresholds: lines 70, branches 60)
+#   3. build    → next build (valida que el build de producción no rompe)
+#   4. e2e      → Playwright (setup auth → chromium/firefox/webkit/visual)
+#
+# Triggers:
+#   - push a main / develop
+#   - pull_request a main / develop
+#   - workflow_dispatch (ejecución manual desde GitHub UI)
+#
+# Optimizaciones de rendimiento:
+#   - Bun cache en ~/.bun/install/cache (restaura node_modules en ~10s)
+#   - next/cache en .next/cache (reutiliza compilaciones entre runs)
+#   - Playwright cache en ~/.cache/ms-playwright (evita re-descargar browsers ~300MB)
+#   - Jobs paralelos: quality + test corren simultáneamente
+#   - E2E solo corre si quality + test + build pasan (no malgasta recursos)
+# =============================================================================
+
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+# Cancela runs anteriores del mismo PR/branch para no malgastar minutos de CI
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Activa el reporter 'github-actions' de Vitest y el reporter 'github' de Playwright
+  # para que los errores aparezcan anotados directamente en el diff del PR
+  CI: true
+  # Node version alineada con el runtime de Next.js 16
+  NODE_VERSION: "20"
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # JOB 1: QUALITY — Lint + Type Check
+  # Corre en paralelo con 'test'. Es el más rápido (~1-2 min).
+  # Falla rápido: si hay errores de lint o tipos, no hace falta esperar los tests.
+  # ---------------------------------------------------------------------------
+  quality:
+    name: Quality (lint + types)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Cache Bun dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+          restore-keys: |
+            bun-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      # TypeScript — verifica tipos sin emitir archivos
+      - name: Type check
+        run: bun run type-check
+        # package.json: "type-check": "tsc --noEmit"
+
+      # ESLint — 0 warnings permitidos (configurado en lint-staged.config.mjs)
+      - name: ESLint
+        run: bun run lint
+        # package.json: "lint": "eslint . --max-warnings 0"
+
+      # Stylelint — valida CSS/CSS Modules (stylelint-config-standard + tailwindcss)
+      - name: Stylelint
+        run: bun run lint:css
+        # package.json: "lint:css": "stylelint '**/*.css' --max-warnings 0"
+
+  # ---------------------------------------------------------------------------
+  # JOB 2: TEST — Vitest con cobertura
+  # Corre en paralelo con 'quality'.
+  # Genera artefactos de cobertura para Codecov y el reporte HTML.
+  # ---------------------------------------------------------------------------
+  test:
+    name: Unit tests (vitest)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Cache Bun dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+          restore-keys: |
+            bun-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      # Corre Vitest con cobertura v8
+      # Reportes generados: text (terminal) + html + lcov + json-summary
+      # Umbrales: lines 70%, functions 70%, branches 60%, statements 70%
+      # Si no se alcanzan los thresholds, el job falla aquí
+      - name: Run tests with coverage
+        run: bun run test:ci
+        # package.json: "test:ci": "vitest run --coverage"
+
+      # Sube el reporte de cobertura a Codecov
+      # Requiere CODECOV_TOKEN en GitHub Secrets (repositorios privados)
+      # En repositorios públicos funciona sin token
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage/lcov.info
+          fail_ci_if_error: false # No romper el CI si Codecov falla
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      # Guarda el reporte HTML de cobertura como artefacto descargable
+      # Útil para revisar líneas no cubiertas sin instalar nada localmente
+      - name: Upload coverage report
+        if: always() # Subir incluso si los thresholds fallan
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 7
+
+  # ---------------------------------------------------------------------------
+  # JOB 3: BUILD — Next.js production build
+  # Depende de quality + test. Si alguno falla, no se ejecuta.
+  # Cachea .next/cache para que los E2E no tengan que recompilar.
+  # ---------------------------------------------------------------------------
+  build:
+    name: Build (next build)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: [quality, test]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Cache Bun dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+          restore-keys: |
+            bun-${{ runner.os }}-
+
+      # Cache del compilador de Next.js (.next/cache)
+      # Reutiliza compilaciones parciales entre runs — reduce build time ~40-60%
+      - name: Cache Next.js build
+        uses: actions/cache@v4
+        with:
+          path: .next/cache
+          key: nextjs-${{ runner.os }}-${{ hashFiles('bun.lock') }}-${{ hashFiles('src/**/*.{ts,tsx,css}') }}
+          restore-keys: |
+            nextjs-${{ runner.os }}-${{ hashFiles('bun.lock') }}-
+            nextjs-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build
+        run: bun run build
+        env:
+          # Variables de entorno necesarias para el build de producción
+          # Agregar aquí las variables públicas (NEXT_PUBLIC_*) del proyecto
+          NEXT_TELEMETRY_DISABLED: 1
+
+      # Guarda el build como artefacto para que el job e2e lo reutilice
+      # Evita un segundo build de ~2-3 minutos en el job de E2E
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: next-build
+          path: |
+            .next/
+            public/
+          retention-days: 1 # Solo necesario para el run actual
+
+  # ---------------------------------------------------------------------------
+  # JOB 4: E2E — Playwright
+  # Depende de build. Descarga el artefacto del build para no recompilar.
+  # Matriz de browsers: chromium, firefox, webkit, visual
+  # ---------------------------------------------------------------------------
+  e2e:
+    name: E2E (${{ matrix.project }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: [build]
+
+    strategy:
+      fail-fast: false # Si webkit falla, chromium y firefox siguen corriendo
+      matrix:
+        project: [chromium, firefox, webkit, visual]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Cache Bun dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+          restore-keys: |
+            bun-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      # Cache de binarios de browsers de Playwright (~300MB por browser)
+      # La key incluye la versión de @playwright/test para invalidar
+      # automáticamente cuando se actualiza Playwright
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+
+      # Solo instala browsers si no estaban en caché
+      - name: Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: bunx playwright install --with-deps ${{ matrix.project == 'visual' && 'chromium' || matrix.project }}
+
+      # Instala dependencias del sistema aunque los browsers estén cacheados
+      # (librerías del SO que Playwright necesita pero que no se cachean)
+      - name: Install system dependencies
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: bunx playwright install-deps ${{ matrix.project == 'visual' && 'chromium' || matrix.project }}
+
+      # Descarga el build de Next.js del job anterior
+      # webServer en playwright.config.ts ejecuta 'bun run start' con este build
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: next-build
+
+      # Ejecuta el proyecto específico de la matriz
+      # El proyecto 'setup' corre automáticamente como dependencia (dependencies: ['setup'])
+      - name: Run Playwright tests
+        run: bunx playwright test --project=${{ matrix.project }}
+        env:
+          BASE_URL: http://localhost:3000
+          E2E_USER_EMAIL: ${{ secrets.E2E_USER_EMAIL }}
+          E2E_USER_PASSWORD: ${{ secrets.E2E_USER_PASSWORD }}
+          E2E_ADMIN_EMAIL: ${{ secrets.E2E_ADMIN_EMAIL }}
+          E2E_ADMIN_PASSWORD: ${{ secrets.E2E_ADMIN_PASSWORD }}
+
+      # Sube reporte HTML + artefactos de tests fallidos
+      # always() garantiza que se suba aunque el job falle — imprescindible para debugging
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ matrix.project }}
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7

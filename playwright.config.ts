@@ -56,7 +56,7 @@ export default defineConfig({
 
   // Directorio donde Playwright busca los tests E2E.
   // Se separa de los tests unitarios (src/) para claridad arquitectural.
-  testDir: './e2e',
+  testDir: '@e2e',
 
   // Patrón de archivos de test E2E.
   // Alternativa: '**/*.e2e.ts' si prefieres el sufijo .e2e en vez de .spec.

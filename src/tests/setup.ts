@@ -61,7 +61,7 @@ import '@testing-library/jest-dom';
 //   Alternativa: 'warn' (avisa pero no falla) o 'bypass' (no recomendado).
 
 import { afterAll, afterEach, beforeAll } from 'vitest';
-import { server } from './mocks/node';
+import { server } from '../mocks/node';
 
 beforeAll(() =>
   server.listen({

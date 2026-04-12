@@ -412,7 +412,7 @@ export default config;
 //
 // 🔗 HOOKS DE HUSKY:
 //   .husky/commit-msg     → valida el mensaje final con commitlint:
-//     bunx commitlint --edit "$1" --config commitlint.config.frontend.mjs
+//     bunx commitlint --edit "$1" --config commitlint.config.mjs
 //
 //   .husky/prepare-commit-msg → abre el wizard al hacer git commit:
 //     exec < /dev/tty && node_modules/.bin/cz --hook || true
