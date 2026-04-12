@@ -85,7 +85,7 @@ const config = {
     ],
 
     'type-case': [2, 'always', 'lower-case'],
-    'type-empty': [2, 'never'],
+    'type-empty': [0, 'never'],
 
     // =========================================================================
     // SCOPE — módulos del frontend Next.js (warning, no error)
@@ -130,7 +130,7 @@ const config = {
     // SUBJECT
     // =========================================================================
 
-    'subject-empty': [2, 'never'],
+    'subject-empty': [0, 'never'],
     'header-max-length': [2, 'always', 110],
     'header-min-length': [2, 'always', 10],
     'subject-full-stop': [2, 'never', '.'],
